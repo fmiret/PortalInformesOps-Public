@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Stock per magatzem i compte</title>
+<style>
+  :root{
+    --bg:#16171a; --card:#1e2023; --border:#33353a; --text:#e7e7e5;
+    --muted:#8b8d92; --accent:#B31E83; --head:#26282c; --row-hover:#25272b;
+    --input-bg:#101113; --panel-bg:#202226; --brand:#B31E83;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--brand); color:var(--text); margin:0; padding:32px;
+  }
+  .wrap{max-width:1200px;margin:0 auto;}
+  .titlebar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:4px;}
+  h1{font-size:22px;margin:0;color:#fff;}
+  .brandbox{background:#fff;border-radius:8px;padding:6px 16px;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .brandbox img{display:block;height:34px;}
+  .sub{color:rgba(255,255,255,.8);font-size:14.5px;margin-bottom:20px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px;}
+  .kpis{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+  .kpi{flex:1;min-width:160px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .kpi .label{font-size:13.5px;color:var(--muted);margin-bottom:4px;}
+  .kpi .value{font-size:20px;font-weight:600;color:#fff;}
+  .controls{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+  input[type=text],input[type=number],select{
+    padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;
+    background:var(--input-bg); color:var(--text);
+  }
+  input[type=text]:focus,input[type=number]:focus,select:focus{outline:1px solid var(--accent);}
+  button{
+    padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;
+    background:var(--input-bg);color:var(--text);cursor:pointer;
+  }
+  button:hover{border-color:var(--accent);}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+  button.primary:hover{filter:brightness(1.08);}
+  .chip{font-size:12.5px;color:var(--muted);}
+  .fieldzones{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .fieldzone{
+    flex:1;min-width:260px;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;
+    display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:20px;background:rgba(255,255,255,0.02);
+  }
+  .fieldzone.dragover{border-color:var(--accent);background:rgba(179,30,131,0.08);}
+  .fieldzone-label{font-size:12.5px;color:var(--muted);margin-right:2px;white-space:nowrap;}
+  .fieldzone .chip-hint{font-size:12.5px;color:var(--muted);font-style:italic;}
+  .field-chip{
+    display:inline-flex;align-items:center;gap:4px;background:var(--input-bg);border:1px solid var(--border);
+    border-radius:6px;padding:4px 6px 4px 10px;font-size:14px;cursor:grab;user-select:none;
+  }
+  .field-chip.dragging{opacity:.35;}
+  .field-chip .funnel{padding:2px 4px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--border);}
+  /* 02/09/2026: peticio de Francesc -- pujar la mida de les DADES (cos de la taula), no dels
+     textos informatius (ja tocats en una millora anterior). Nomes les cel·les td, no les th. */
+  td{font-size:15px;}
+  th.align-left,td.align-left{text-align:left;}
+  th{background:var(--head);user-select:none;position:sticky;top:0;font-weight:600;white-space:nowrap;z-index:2;}
+  th .thbox{display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+  th.align-left .thbox{justify-content:flex-start;}
+  th .label{cursor:pointer;}
+  th.sorted .label{color:var(--accent);}
+  .funnel{
+    cursor:pointer;border:none;background:none;color:var(--muted);font-size:13px;padding:2px 4px;border-radius:4px;line-height:1;
+  }
+  .funnel:hover{color:var(--text);background:#333;}
+  .funnel.active{color:var(--accent);}
+  tbody tr:hover{background:var(--row-hover);}
+  tfoot td{font-weight:600;border-top:2px solid var(--border);background:var(--head);}
+  .tablewrap{max-height:640px;overflow:auto;border:1px solid var(--border);border-radius:8px;}
+
+  #filterPanel{
+    position:fixed;display:none;z-index:1000;background:var(--panel-bg);border:1px solid var(--border);
+    border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.5);padding:10px;width:260px;font-size:14.5px;
+  }
+  #filterPanel .fp-search{width:100%;margin-bottom:8px;}
+  #filterPanel .fp-values{max-height:180px;overflow:auto;border:1px solid var(--border);border-radius:6px;padding:6px;margin-bottom:10px;background:var(--input-bg);}
+  #filterPanel .fp-values label{display:flex;align-items:center;gap:6px;padding:3px 2px;cursor:pointer;font-size:14px;}
+  #filterPanel .fp-values label:hover{background:#2c2e33;}
+  #filterPanel .fp-selectall{border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:4px;font-weight:600;}
+  #filterPanel .fp-custom{border-top:1px solid var(--border);padding-top:10px;margin-top:4px;}
+  #filterPanel .fp-custom-title{font-size:12.5px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;}
+  #filterPanel select, #filterPanel input[type=text], #filterPanel input[type=number]{width:100%;margin-bottom:6px;}
+  #filterPanel .fp-between{display:flex;gap:6px;align-items:center;}
+  #filterPanel .fp-actions{display:flex;justify-content:space-between;gap:6px;margin-top:10px;}
+  #filterPanel .fp-actions button{flex:1;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="titlebar">
+    <h1>Stock per magatzem i compte</h1>
+    <div class="brandbox"><img src="data:image/png;base64,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" alt="Grup Fedefarma"></div>
+  </div>
+  <div class="sub">Font: Informix (DSN ol_rssreal), extret juntament amb les dades de venda i hores en el CSV compartit del Portal. Quantitat = galmstkg (stock actual). Laboratori = garticul.fabric -> ctercero. Cost = cost TANCAT de galmvalo (mateix criteri de valoracio que Informe Diari/Dossier Mensual des del 30/08/2026, perque els 3 informes siguin comparables entre si -- NO es el cost viu d'avui, que es recalcula cada dia segons entren compres i per tant mai coincidiria exacte amb una data ja tancada) x quantitat. Stock > 0. El numero d'articles es un recompte de referencies UNIQUES (no de linies magatzem/compte/laboratori). Generat el 15/09/2026 16:22.</div>
+
+  <div class="card" id="waitingData">
+    <h2 style="margin-top:0;color:#fff;font-size:17.5px;">Esperant dades…</h2>
+    <p class="sub" style="margin-bottom:0;">
+      Aquest informe carrega les dades des del fitxer únic compartit (Datos_Portal_Stock.csv).
+      Si l'obres dins del <strong>Portal</strong>, selecciona aquest fitxer a la barra lateral (a sobre de "Documentació") i es carregarà aquí automàticament.
+      Si l'obres com a fitxer independent (fora del Portal), es prova de carregar automàticament el CSV si viu a la mateixa carpeta, o pots carregar-lo manualment:
+    </p>
+    <button id="standaloneFileBtn" type="button" style="margin-top:12px;background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer;">📂&nbsp;Carregar Datos_Portal_Stock.csv</button>
+    <input type="file" id="standaloneFileInput" accept=".csv" style="display:none;">
+  </div>
+
+  <div id="mainContent" style="display:none;">
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <div class="controls">
+      <input type="text" id="search" placeholder="Cerca ràpida (magatzem, compte, laboratori)...">
+      <span class="chip">Vendes / Dies d'estoc:</span>
+      <span id="ventaBasisCtrl"></span>
+      <button id="clearFilters">Treure filtres</button>
+      <button id="exportCsvBtn">Exportar CSV</button>
+      <span class="chip" id="filterChip"></span>
+    </div>
+    <div class="fieldzones">
+      <div class="fieldzone" id="rowFieldsZone" data-zone="rows">
+        <span class="fieldzone-label">Agrupar per:</span>
+      </div>
+      <div class="fieldzone" id="filterFieldsZone" data-zone="filters">
+        <span class="fieldzone-label">Només filtrar (sense segmentar):</span>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table id="tbl">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+        <tfoot id="tfoot"></tfoot>
+      </table>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div id="filterPanel"></div>
+
+<script>
+// CAMBIO DE ARQUITECTURA (05/08/2026): RAW ya no llega embebido desde PowerShell -- se inicializa
+// vacio y lo rellena construirStock() en cuanto llega el CSV unico (Datos_para_Portal_Ops.csv, via
+// postMessage del Portal), filtrando solo las filas con tipo_fila="stock".
+let RAW = { alm: [], cue: [], lab: [], rows: [], venta: new Map(), nArticulos: 0 };
+
+const DIM_META = {
+  codalm:          {dictKey:'alm',  idx:0, label:'Magatzem'},
+  cuenta:          {dictKey:'cue',  idx:1, label:'Compte'},
+  laboratorio:     {dictKey:'lab',  idx:2, label:'Laboratori'},
+  codart:          {dictKey:'art',  idx:3, label:'Article'},
+  // descripcion y codigo_nacional comparten el mismo idx (3) que codart -- son atributos 1:1 del
+  // articulo (06/08/2026, peticion de Francesc: "Descripcion y Codigo Nacional del articulo"), no
+  // dimensiones independientes: se guardan en listas paralelas a RAW.art (misma posicion = mismo
+  // articulo), asi que decode() los resuelve con el mismo mecanismo generico que el resto de dims.
+  descripcion:     {dictKey:'desc', idx:3, label:'Descripció'},
+  codigo_nacional: {dictKey:'cn',   idx:3, label:'Codi Nacional'},
+};
+const dimKeys = Object.keys(DIM_META);
+// 'venta90'/'dies_estoc' anadides el 04/09/2026 (peticion de Francesc): venda neta dels ultims 90
+// dies i dies d'estoc que en resulten, amb un selector Euros/Unitats (ventaBasis, mes avall) que
+// afecta ALS DOS -- 'venta90' mostra unitats o euros segons el selector, i 'dies_estoc' es calcula
+// SEMPRE amb el numerador (estoc) i denominador (venda) en la MATEIXA unitat. No son filtrable
+// (son valors derivats/agregats, no un camp brut de cada fila -- filtrar-hi no tindria el mateix
+// significat un cop agrupat).
+const MEASURES = [
+  {key:'n_articulos', label:'Nº articles', filterable:false},
+  {key:'suma_stkbas',  label:'Stock (uds.)', filterable:true},
+  {key:'suma_cost',    label:'Cost',         filterable:true},
+  {key:'venta90',      label:'Vendes (90 dies)', filterable:false},
+  {key:'dies_estoc',   label:"Dies d'estoc",     filterable:false},
+];
+const measureKeys = MEASURES.map(m=>m.key);
+const filterableMeasureKeys = MEASURES.filter(m=>m.filterable).map(m=>m.key);
+// Finestra de venda per calcular "Dies d'estoc" (04/09/2026): mateix criteri que Informe Diari/
+// Dossier Mensual (90 dies), pero aqui la venda ja arriba PRE-AGREGADA des del CSV (columnes
+// venta90_uds/venta90_eur, calculades a Generar_Datos_CSV.ps1 amb una consulta a Informix sobre
+// gvenmovh_his/gvenmovl_his, tipus de document inicial AVD/AVF/AVP/AVS/AVT/VTE/AVV/AV) -- aquest
+// informe NO te dimensio de temps ("foto actual"), aixi que no es pot recalcular la finestra al
+// navegador com als altres 2 informes.
+const VENTANA_DIES_ESTOC = 90;
+let ventaBasis = 'unidades';
+
+// codart/descripcion/codigo_nacional entran como "solo filtrar" por defecto (06/08/2026, peticion
+// de Francesc: "podria poner un filtro de articulo?" / "Descripcion y Codigo Nacional") -- ya
+// llegan a nivel de detalle en cada fila del CSV, solo faltaba exponer los valores reales (antes
+// solo se usaba internamente para el recuento de unicos). No entran en rowFields por defecto
+// porque agrupar por articulo/descripcion/CN desde el primer render generaria miles de filas; el
+// usuario puede arrastrar cualquiera de los 3 a "Agrupar por" si lo necesita.
+let rowFields = dimKeys.filter(k => !['codalm','codart','descripcion','codigo_nacional'].includes(k));
+let filterOnlyFields = ['codalm', 'codart', 'descripcion', 'codigo_nacional'];
+let filters = {};
+let quickSearch = '';
+let sortKey = 'suma_cost', sortDir = -1;
+
+const fmt = n => Number(n).toLocaleString('es-ES', {maximumFractionDigits:2});
+const fmtCost = n => Number(n).toLocaleString('es-ES', {maximumFractionDigits:0}) + ' €';
+const fmtVenta = n => ventaBasis === 'euros' ? fmtCost(n) : fmt(n);
+const fmtDies = v => (v === null || v === undefined || !isFinite(v)) ? 'Sense dades' : Number(v).toLocaleString('es-ES', {maximumFractionDigits:1}) + ' dies';
+const decode = (dim, idx) => RAW[DIM_META[dim].dictKey][idx];
+
+// ---------- Carga de datos desde el CSV compartido (05/08/2026) ----------
+// Puerto JS, 1:1, del algoritmo que antes vivia en Stock_por_Almacen_Cuenta.ps1 tras leer de
+// Informix: mismos indices por diccionario (GetIdx), mismo recuento de articulos distintos
+// (Set/Map de codart), mismo shape final de RAW -- asi el motor de render() de mas abajo no
+// necesita ningun cambio.
+function parseCsvSimple(text){
+  const lines = text.split(/\r?\n/).filter(l => l.length > 0);
+  if (lines.length === 0) return [];
+  const header = lines[0].split(',');
+  const out = [];
+  for (let i = 1; i < lines.length; i++){
+    const cells = lines[i].split(',');
+    const obj = {};
+    header.forEach((h, j) => { obj[h] = cells[j]; });
+    out.push(obj);
+  }
+  return out;
+}
+function construirStock(stockRows){
+  const almIdx = new Map(), almList = [];
+  const cueIdx = new Map(), cueList = [];
+  const labIdx = new Map(), labList = [];
+  const artIdx = new Map(), artList = [], descList = [], cnList = [];
+  function getIdx(map, list, val){
+    if (map.has(val)) return map.get(val);
+    const i = list.length; list.push(val); map.set(val, i); return i;
+  }
+  const rows = [];
+  // Venda per almacen+article (04/09/2026): NO es 1:1 per article (com desc/cn) -- dos almacens
+  // diferents del mateix article tenen venda diferent -- per aixo es guarda en un Map propi, clau
+  // "ai␟arti", en lloc d'una llista paral·lela a artList.
+  const venta = new Map();
+  for (const r of stockRows){
+    const codalm = r.almacen;
+    const cuenta = r.cuenta;
+    const codart = r.codart;
+    const lab = r.laboratorio || 'SIN LABORATORIO';
+    const stkbas = parseFloat(r.stkbas) || 0;
+    const costTotal = Math.round(parseFloat(r.coste) || 0);
+
+    const ai = getIdx(almIdx, almList, codalm);
+    const ci = getIdx(cueIdx, cueList, cuenta);
+    const li = getIdx(labIdx, labList, lab);
+    // descripcion/codigo_nacional son 1:1 por articulo -- se guardan en listas paralelas a
+    // artList (misma posicion = mismo articulo) solo la primera vez que aparece ese codart, en
+    // vez de usar getIdx (que las dedupliaria por valor y rompería la alineacion de indices).
+    let arti = artIdx.get(codart);
+    if (arti === undefined){
+      arti = artList.length;
+      artIdx.set(codart, arti);
+      artList.push(codart);
+      descList.push(r.descripcion || '');
+      cnList.push(r.codigo_nacional || '');
+    }
+    const vKey = ai + '␟' + arti;
+    if (!venta.has(vKey)){
+      venta.set(vKey, [parseFloat(r.venta90_uds) || 0, parseFloat(r.venta90_eur) || 0]);
+    }
+
+    rows.push([ai, ci, li, arti, stkbas, costTotal]);
+  }
+  RAW = { alm: almList, cue: cueList, lab: labList, art: artList, desc: descList, cn: cnList, rows, venta, nArticulos: artIdx.size };
+  // Filtro inicial por defecto (igual que el informe original): excluye almacenes cuyo codigo
+  // empieza por 'P'. Se aplica aqui, tras conocer ya la lista real de almacenes.
+  filters = { codalm: { mode: 'values', selected: new Set(almList.filter(v => /^[0-9]/.test(v))) } };  // 30/08/2026: generalizado de "empieza por P" a "no empieza por numero" -- ver giff-cuadre-informe-diario-vs-stock-almacen-2026-08.md
+  console.log(`Stock: ${rows.length} filas / Almacenes: ${almList.length} / Cuentas: ${cueList.length} / Laboratorios: ${labList.length} / Articulos distintos: ${artIdx.size}`);
+}
+function inicializarTrasCarga(){
+  document.getElementById('waitingData').style.display = 'none';
+  document.getElementById('mainContent').style.display = '';
+  render();
+}
+function intentarCarregar(datosCsvText){
+  if (datosCsvText == null) return;
+  const filas = parseCsvSimple(datosCsvText).filter(r => r.tipo_fila === 'stock');
+  construirStock(filas);
+  inicializarTrasCarga();
+}
+// Recibe su propio CSV de Stock (Datos_Portal_Stock.csv, foto actual por articulo) desde el
+// Portal (selector "Carregar dades Stock" de la barra lateral) via postMessage. Separado el
+// 14/08/2026 (peticion de Francesc: "aligerar el primer csv") del CSV de Operaciones (venta/
+// horas/qualitat/stock_hist), que este informe no necesita -- antes ambos llegaban juntos con
+// type 'giff-data'.
+window.addEventListener('message', (ev) => {
+  const d = ev.data;
+  if (!d || d.type !== 'giff-data-stock') return;
+  intentarCarregar(d.datosCsv);
+});
+// Avisa al Portal (si este informe vive dentro de un iframe suyo) de que ya esta listo para
+// recibir datos -- asi el Portal puede reenviar el CSV que ya tuviera en cache aunque este iframe
+// se haya cargado despues de que el usuario lo seleccionara.
+window.parent.postMessage({ type: 'giff-ready', report: 'stock' }, '*');
+
+// ---------- Carrega standalone (15/09/2026, peticio de Francesc): aquest informe es publica ara
+// tambe com a fitxer solt (fora del Portal_Informes.html), enllaçat des de "Sistema Central de
+// Reporting". Si no rep el CSV per postMessage d'un Portal pare, prova de carregar-lo tot sol:
+// primer per fetch() del mateix directori (nomes funciona servit per http/https, p.ex. GitHub
+// Pages -- fetch() d'un fitxer local file:// falla per CORS, comportament esperat) i sempre queda
+// disponible el boto manual per triar el CSV a ma. ----------
+(function () {
+  const btn = document.getElementById('standaloneFileBtn');
+  const input = document.getElementById('standaloneFileInput');
+
+  btn.addEventListener('click', () => input.click());
+  input.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) intentarCarregar(await file.text());
+    input.value = '';
+  });
+
+  fetch('Datos_Portal_Stock.csv', { cache: 'no-store' })
+    .then(resp => (resp.ok ? resp.text() : null))
+    .then(text => { if (text != null) intentarCarregar(text); })
+    .catch(() => { /* file:// local, CORS, o CSV no disponible -- es manté el boto manual */ });
+})();
+
+function matchesTextFilter(val, f){
+  if (f.mode === 'values'){
+    if (!f.selected || f.selected.size === 0) return false;
+    return f.selected.has(val);
+  }
+  if (f.mode === 'custom'){
+    const s = String(val).toUpperCase();
+    const t1 = String(f.val1 || '').toUpperCase();
+    switch(f.op){
+      case 'contains': return s.includes(t1);
+      case 'notcontains': return !s.includes(t1);
+      case 'equals': return s === t1;
+      case 'startswith': return s.startsWith(t1);
+      case 'endswith': return s.endsWith(t1);
+      default: return true;
+    }
+  }
+  return true;
+}
+function matchesNumberFilter(val, f){
+  if (f.mode === 'values'){
+    if (!f.selected || f.selected.size === 0) return false;
+    return f.selected.has(String(val));
+  }
+  if (f.mode === 'custom'){
+    const n1 = Number(f.val1), n2 = Number(f.val2);
+    switch(f.op){
+      case 'eq': return val === n1;
+      case 'neq': return val !== n1;
+      case 'gt': return val > n1;
+      case 'gte': return val >= n1;
+      case 'lt': return val < n1;
+      case 'lte': return val <= n1;
+      case 'between': return val >= n1 && val <= n2;
+      default: return true;
+    }
+  }
+  return true;
+}
+
+function rowMatches(r, excludeKey){
+  for (const dim of dimKeys){
+    if (dim === excludeKey) continue;
+    const f = filters[dim];
+    if (!f) continue;
+    if (!matchesTextFilter(decode(dim, r[DIM_META[dim].idx]), f)) return false;
+  }
+  for (const mk of filterableMeasureKeys){
+    if (mk === excludeKey) continue;
+    const f = filters[mk];
+    if (!f) continue;
+    const val = mk === 'suma_stkbas' ? r[4] : r[5];
+    if (!matchesNumberFilter(val, f)) return false;
+  }
+  if (quickSearch){
+    const q = quickSearch.toUpperCase();
+    const hit = dimKeys.some(dim => decode(dim, r[DIM_META[dim].idx]).toUpperCase().includes(q));
+    if (!hit) return false;
+  }
+  return true;
+}
+
+function applyAllFilters(excludeKey){
+  return RAW.rows.filter(r => rowMatches(r, excludeKey || null));
+}
+
+// Suma "venta90" (uds+eur) d'un conjunt de files SENSE repetir-la per cada fila (04/09/2026): la
+// venda es 1 per almacen+article, pero una fila d'aqui es 1 per almacen+cuenta+article -- si
+// s'agrupa per exemple per magatzem amb un article repartit en 3 comptes, sumar la venda 3 cops
+// la triplicaria. "seen" (clau "ai␟arti") es el que evita el doble comptatge.
+function acumularVenta(r, seen, acc){
+  const vKey = r[0] + '␟' + r[3];
+  if (seen.has(vKey)) return;
+  seen.add(vKey);
+  const v = RAW.venta.get(vKey);
+  if (v){ acc.uds += v[0]; acc.eur += v[1]; }
+}
+function diesEstoc(stockUds, stockEur, ventaUds, ventaEur){
+  const stockBasis = ventaBasis === 'euros' ? stockEur : stockUds;
+  const ventaBasisVal = ventaBasis === 'euros' ? ventaEur : ventaUds;
+  const ventaDiaria = ventaBasisVal / VENTANA_DIES_ESTOC;
+  return ventaDiaria > 0 ? stockBasis / ventaDiaria : null;
+}
+function computeTotals(rows){
+  const set = new Set(); let stk = 0, cost = 0;
+  const ventaSeen = new Set(), venta = {uds:0, eur:0};
+  rows.forEach(r=>{
+    set.add(r[3]); stk += r[4]; cost += r[5];
+    acumularVenta(r, ventaSeen, venta);
+  });
+  const venta90 = ventaBasis === 'euros' ? venta.eur : venta.uds;
+  return {
+    n_articulos: set.size, suma_stkbas: stk, suma_cost: cost,
+    venta90, dies_estoc: diesEstoc(stk, cost, venta.uds, venta.eur),
+  };
+}
+
+function groupRows(rows){
+  if (rowFields.length === 0){
+    return rows.length ? [computeTotals(rows)] : [];
+  }
+  const map = new Map();
+  for (const r of rows){
+    const key = rowFields.map(k => r[DIM_META[k].idx]).join('␟');
+    let g = map.get(key);
+    if (!g){
+      g = {_set: new Set(), suma_stkbas: 0, suma_cost: 0, _ventaSeen: new Set(), _venta: {uds:0, eur:0}};
+      rowFields.forEach(k => { g[k] = decode(k, r[DIM_META[k].idx]); });
+      map.set(key, g);
+    }
+    g._set.add(r[3]);
+    g.suma_stkbas += r[4];
+    g.suma_cost += r[5];
+    acumularVenta(r, g._ventaSeen, g._venta);
+  }
+  const out = [...map.values()];
+  out.forEach(g => {
+    g.n_articulos = g._set.size;
+    g.venta90 = ventaBasis === 'euros' ? g._venta.eur : g._venta.uds;
+    g.dies_estoc = diesEstoc(g.suma_stkbas, g.suma_cost, g._venta.uds, g._venta.eur);
+    delete g._set; delete g._ventaSeen; delete g._venta;
+  });
+  return out;
+}
+
+function chipHtml(key){
+  const label = DIM_META[key] ? DIM_META[key].label : key;
+  return `<span class="field-chip" draggable="true" data-key="${key}">${label}
+    <button class="funnel ${filters[key] ? 'active' : ''}" data-funnel="${key}" title="Filtrar">▼</button>
+  </span>`;
+}
+
+function renderFieldZones(){
+  const rowsZone = document.getElementById('rowFieldsZone');
+  const filtZone = document.getElementById('filterFieldsZone');
+  rowsZone.innerHTML = '<span class="fieldzone-label">Agrupar per:</span>' +
+    (rowFields.length ? rowFields.map(chipHtml).join('') : '<span class="chip-hint">arrossega aquí un camp per segmentar-hi</span>');
+  filtZone.innerHTML = '<span class="fieldzone-label">Només filtrar (sense segmentar):</span>' +
+    (filterOnlyFields.length ? filterOnlyFields.map(chipHtml).join('') : '<span class="chip-hint">arrossega aquí un camp per deixar d\'agrupar-lo</span>');
+
+  [rowsZone, filtZone].forEach(zone=>{
+    zone.querySelectorAll('.field-chip').forEach(chip=>{
+      chip.addEventListener('dragstart', (e)=>{
+        e.dataTransfer.setData('text/plain', chip.dataset.key);
+        e.dataTransfer.effectAllowed = 'move';
+        chip.classList.add('dragging');
+      });
+      chip.addEventListener('dragend', ()=> chip.classList.remove('dragging'));
+    });
+    zone.querySelectorAll('.funnel').forEach(el=>{
+      el.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        openFilterPanel(el.dataset.funnel, el);
+      });
+    });
+    zone.addEventListener('dragover', (e)=>{ e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', ()=> zone.classList.remove('dragover'));
+    zone.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const key = e.dataTransfer.getData('text/plain');
+      if (!key) return;
+      rowFields = rowFields.filter(k=>k!==key);
+      filterOnlyFields = filterOnlyFields.filter(k=>k!==key);
+      if (zone === rowsZone) rowFields.push(key); else filterOnlyFields.push(key);
+      render();
+    });
+  });
+}
+
+// Selector Euros/Unitats per a "Vendes (90 dies)" i "Dies d'estoc" (04/09/2026) -- afecta als dos
+// alhora (mateixa unitat al numerador i denominador del ratio, ver diesEstoc() mes amunt).
+function renderVentaBasisCtrl(){
+  const el = document.getElementById('ventaBasisCtrl');
+  const opts = [{v:'unidades', label:'Unitats'}, {v:'euros', label:'Euros'}];
+  el.innerHTML = opts.map(o => `<button data-v="${o.v}" class="${o.v===ventaBasis?'primary':''}">${o.label}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{ ventaBasis = b.dataset.v; render(); });
+  });
+}
+function render(){
+  const filtered = applyAllFilters(null);
+  let rows = groupRows(filtered);
+
+  const validSortKeys = [...rowFields, ...measureKeys];
+  if (!validSortKeys.includes(sortKey)){ sortKey = 'n_articulos'; sortDir = -1; }
+
+  rows = rows.sort((a,b)=>{
+    const av=a[sortKey], bv=b[sortKey];
+    if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+    return sortDir * ((av||0) - (bv||0));
+  });
+
+  renderFieldZones();
+  renderVentaBasisCtrl();
+
+  const thead = document.getElementById('thead');
+  const headKeys = [...rowFields, ...measureKeys];
+  thead.innerHTML = '<tr>' + headKeys.map(k => {
+    const isDim = dimKeys.includes(k);
+    const label = isDim ? DIM_META[k].label : MEASURES.find(m=>m.key===k).label;
+    const isFilterable = !isDim && filterableMeasureKeys.includes(k);
+    return `
+    <th data-key="${k}" class="${sortKey===k ? 'sorted' : ''} ${isDim ? 'align-left' : ''}">
+      <div class="thbox">
+        <span class="label" data-sortkey="${k}">${label}${sortKey===k ? (sortDir===1?' ↑':' ↓') : ''}</span>
+        ${isFilterable ? `<button class="funnel ${filters[k] ? 'active' : ''}" data-funnel="${k}" title="Filtrar">▼</button>` : ''}
+      </div>
+    </th>`;
+  }).join('') + '</tr>';
+
+  thead.querySelectorAll('.label').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.dataset.sortkey;
+      if (sortKey===key) sortDir *= -1; else { sortKey = key; sortDir = -1; }
+      render();
+    });
+  });
+  thead.querySelectorAll('.funnel').forEach(el=>{
+    el.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      openFilterPanel(el.dataset.funnel, el);
+    });
+  });
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = rows.map(r => `<tr>
+    ${rowFields.map(k => `<td class="align-left">${r[k]}</td>`).join('')}
+    <td>${fmt(r.n_articulos)}</td>
+    <td>${fmt(r.suma_stkbas)}</td>
+    <td>${fmtCost(r.suma_cost)}</td>
+    <td>${fmtVenta(r.venta90)}</td>
+    <td>${fmtDies(r.dies_estoc)}</td>
+  </tr>`).join('');
+
+  const totals = computeTotals(filtered);
+  document.getElementById('tfoot').innerHTML = `<tr>
+    <td colspan="${Math.max(rowFields.length,1)}">Total (${rows.length} files)</td>
+    <td>${fmt(totals.n_articulos)}</td>
+    <td>${fmt(totals.suma_stkbas)}</td>
+    <td>${fmtCost(totals.suma_cost)}</td>
+    <td>${fmtVenta(totals.venta90)}</td>
+    <td>${fmtDies(totals.dies_estoc)}</td>
+  </tr>`;
+
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="label">Articles diferents (total BD)</div><div class="value">${fmt(RAW.nArticulos)}</div></div>
+    <div class="kpi"><div class="label">Articles diferents (visibles)</div><div class="value">${fmt(totals.n_articulos)}</div></div>
+    <div class="kpi"><div class="label">Files visibles (agrupades)</div><div class="value">${fmt(rows.length)}</div></div>
+    <div class="kpi"><div class="label">Stock visible (uds.)</div><div class="value">${fmt(totals.suma_stkbas)}</div></div>
+    <div class="kpi"><div class="label">Cost visible</div><div class="value">${fmtCost(totals.suma_cost)}</div></div>
+    <div class="kpi"><div class="label">Vendes visibles (90 dies)</div><div class="value">${fmtVenta(totals.venta90)}</div></div>
+    <div class="kpi"><div class="label">Dies d'estoc</div><div class="value">${fmtDies(totals.dies_estoc)}</div></div>
+  `;
+
+  const activeCount = Object.keys(filters).filter(k => filters[k]).length;
+  document.getElementById('filterChip').textContent = activeCount ? `${activeCount} filtre(s) de columna actius` : '';
+}
+
+const panel = document.getElementById('filterPanel');
+
+function openFilterPanel(colKey, anchorEl){
+  const isDim = dimKeys.includes(colKey);
+  const candidateRows = applyAllFilters(colKey);
+  const uniqueVals = isDim
+    ? [...new Set(candidateRows.map(r => decode(colKey, r[DIM_META[colKey].idx])))].sort((a,b)=>a.localeCompare(b))
+    : [...new Set(candidateRows.map(r => colKey==='suma_stkbas' ? r[4] : r[5]))].sort((a,b)=>a-b);
+
+  const existing = filters[colKey];
+  let tempSelected;
+  if (existing && existing.mode === 'values'){
+    tempSelected = new Set(existing.selected);
+  } else if (existing && existing.mode === 'custom'){
+    tempSelected = new Set(uniqueVals.filter(v => isDim ? matchesTextFilter(v, existing) : matchesNumberFilter(v, existing)));
+  } else {
+    tempSelected = new Set(uniqueVals);
+  }
+
+  function fmtVal(v){ return isDim ? v : (colKey==='suma_cost' ? fmtCost(v) : fmt(v)); }
+
+  function buildValuesList(filterText){
+    const ft = (filterText||'').toUpperCase();
+    return uniqueVals.filter(v => !ft || String(v).toUpperCase().includes(ft)).map(v => `
+      <label><input type="checkbox" class="fp-val" value="${String(v).replace(/"/g,'&quot;')}" ${tempSelected.has(v)?'checked':''}> ${fmtVal(v)}</label>
+    `).join('');
+  }
+
+  const numericOps = `
+    <option value="eq">Igual a</option>
+    <option value="neq">Diferent de</option>
+    <option value="gt">Més gran que</option>
+    <option value="gte">Més gran o igual que</option>
+    <option value="lt">Més petit que</option>
+    <option value="lte">Més petit o igual que</option>
+    <option value="between">Entre</option>`;
+  const textOps = `
+    <option value="contains">Conté</option>
+    <option value="notcontains">No conté</option>
+    <option value="equals">És igual a</option>
+    <option value="startswith">Comença per</option>
+    <option value="endswith">Acaba en</option>`;
+
+  const custom = (existing && existing.mode === 'custom') ? existing : {op: isDim ? 'contains' : 'gt', val1:'', val2:''};
+
+  panel.innerHTML = `
+    <input type="text" class="fp-search" placeholder="Cercar valor...">
+    <div class="fp-selectall"><label><input type="checkbox" class="fp-selectall-cb" ${tempSelected.size===uniqueVals.length?'checked':''}> (Seleccionar tot)</label></div>
+    <div class="fp-values">${buildValuesList('')}</div>
+    <div class="fp-custom">
+      <div class="fp-custom-title">Filtre personalitzat</div>
+      <select class="fp-op">${isDim ? textOps : numericOps}</select>
+      <input type="${isDim ? 'text' : 'number'}" class="fp-val1" placeholder="Valor" value="${custom.val1||''}">
+      <div class="fp-between" style="display:none;">
+        <span class="chip">i</span>
+        <input type="number" class="fp-val2" placeholder="Valor fins a" value="${custom.val2||''}">
+      </div>
+    </div>
+    <div class="fp-actions">
+      <button class="fp-clear">Treure filtre</button>
+    </div>
+  `;
+
+  panel.querySelector('.fp-op').value = custom.op;
+  const betweenBox = panel.querySelector('.fp-between');
+  betweenBox.style.display = custom.op === 'between' ? 'flex' : 'none';
+  // Millora 1 (02/09/2026, peticio de Francesc): tot el panell s'aplica EN VIU -- ja no hi ha
+  // boto "Aplicar". Cada canvi (checkbox, "Seleccionar tot", operador o valor del filtre
+  // personalitzat, incloent el cas "Entre" amb 2 valors) recalcula filters[colKey] i crida
+  // render() a l'instant, amb un petit debounce NOMES als camps de text/numero lliures per no
+  // recalcular tota la taula a cada tecla en fitxers grans.
+  function applyLive(){
+    const val1 = panel.querySelector('.fp-val1').value;
+    const val2 = panel.querySelector('.fp-val2') ? panel.querySelector('.fp-val2').value : '';
+    if (val1 !== ''){
+      filters[colKey] = {mode:'custom', op: panel.querySelector('.fp-op').value, val1, val2};
+    } else if (tempSelected.size === uniqueVals.length){
+      delete filters[colKey];
+    } else {
+      filters[colKey] = {mode:'values', selected: new Set(tempSelected)};
+    }
+    render();
+  }
+  panel.querySelector('.fp-op').addEventListener('change', (e)=>{
+    betweenBox.style.display = e.target.value === 'between' ? 'flex' : 'none';
+    applyLive();
+  });
+
+  function wireCheckboxes(){
+    panel.querySelectorAll('.fp-val').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const v = isDim ? cb.value : Number(cb.value);
+        if (cb.checked) tempSelected.add(v); else tempSelected.delete(v);
+        applyLive();
+      });
+    });
+  }
+  wireCheckboxes();
+
+  panel.querySelector('.fp-search').addEventListener('input', (e)=>{
+    panel.querySelector('.fp-values').innerHTML = buildValuesList(e.target.value);
+    wireCheckboxes();
+  });
+
+  panel.querySelector('.fp-selectall-cb').addEventListener('change', (e)=>{
+    if (e.target.checked){ uniqueVals.forEach(v=>tempSelected.add(v)); }
+    else { uniqueVals.forEach(v=>tempSelected.delete(v)); }
+    panel.querySelector('.fp-values').innerHTML = buildValuesList(panel.querySelector('.fp-search').value);
+    wireCheckboxes();
+    applyLive();
+  });
+
+  panel.querySelector('.fp-clear').addEventListener('click', ()=>{
+    delete filters[colKey];
+    closePanel();
+    render();
+  });
+
+  let valDebounceTimer = null;
+  const debouncedApply = ()=>{ clearTimeout(valDebounceTimer); valDebounceTimer = setTimeout(applyLive, 180); };
+  panel.querySelector('.fp-val1').addEventListener('input', debouncedApply);
+  if (panel.querySelector('.fp-val2')) panel.querySelector('.fp-val2').addEventListener('input', debouncedApply);
+
+  const rect = anchorEl.getBoundingClientRect();
+  panel.style.display = 'block';
+  const panelWidth = 260;
+  let left = rect.left;
+  if (left + panelWidth > window.innerWidth - 10) left = window.innerWidth - panelWidth - 10;
+  panel.style.top = (rect.bottom + 4) + 'px';
+  panel.style.left = left + 'px';
+}
+
+function closePanel(){ panel.style.display = 'none'; }
+
+document.addEventListener('click', (e)=>{
+  if (panel.style.display === 'block' && !panel.contains(e.target) && !e.target.classList.contains('funnel')){
+    closePanel();
+  }
+});
+document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closePanel(); });
+
+// ---------- Exportar CSV (la tabla tal y como se ve: filtros, orden y agrupacion actuales) ----------
+// (14/08/2026, peticion de Francesc: "el informe de stock incluye un boton para exportar a
+// fichero" -- mismo mecanismo que ya tenian el Informe Diario y el Dossier Mensual desde el
+// 26/07/2026, portado 1:1 aqui.)
+function tableToCsv(table){
+  const rows = [];
+  table.querySelectorAll('tr').forEach(tr=>{
+    const cells = [...tr.children].map(cell=>{
+      let text = cell.textContent.replace(/\s+/g,' ').trim();
+      if (text.includes(';') || text.includes('"') || text.includes('\n')) text = '"' + text.replace(/"/g,'""') + '"';
+      return text;
+    });
+    rows.push(cells.join(';'));
+  });
+  return rows.join('\r\n');
+}
+function downloadCsv(csvContent, filename){
+  const blob = new Blob([String.fromCharCode(65279) + csvContent], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+document.getElementById('exportCsvBtn').addEventListener('click', ()=>{
+  const fechaStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const nombre = `stock_por_almacen_cuenta_${fechaStr}.csv`;
+  downloadCsv(tableToCsv(document.getElementById('tbl')), nombre);
+});
+
+document.getElementById('search').addEventListener('input', (e)=>{ quickSearch = e.target.value.trim(); render(); });
+document.getElementById('clearFilters').addEventListener('click', ()=>{ filters = {}; document.getElementById('search').value=''; quickSearch=''; render(); });
+// NOTA (05/08/2026): ya no hay una llamada incondicional a render() aqui -- se dispara desde
+// inicializarTrasCarga() en cuanto el CSV unico (Datos_para_Portal_Ops.csv) esta cargado.
+</script>
+</body>
+</html>
