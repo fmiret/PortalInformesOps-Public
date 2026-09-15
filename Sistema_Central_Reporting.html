@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Sistema Central de Reporting - Fedefarma</title>
+<style>
+  :root{
+    --bg:#16171a;--card:#1e2023;--border:#33353a;--text:#e7e7e5;--muted:#8b8d92;
+    --accent:#B31E83;--brand:#B31E83;--head:#26282c;--row-hover:#25272b;--input-bg:#101113;
+    --panel-bg:#202226;--sidebar-w:280px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);display:flex;overflow:hidden;
+  }
+  #sidebar{
+    width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--card);
+    border-right:1px solid var(--border);display:flex;flex-direction:column;
+    transition:margin-left .2s ease;height:100vh;
+  }
+  #sidebar.collapsed{margin-left:calc(-1 * var(--sidebar-w));}
+  .sb-header{padding:18px 16px 10px 16px;}
+  .sb-header .brand{font-size:15px;font-weight:700;color:#fff;}
+  .sb-header .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto;}
+  .sb-group{margin-bottom:4px;}
+  .sb-group-header{
+    display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;
+    cursor:pointer;color:#fff;font-size:13.5px;font-weight:700;user-select:none;
+  }
+  .sb-group-header:hover{background:var(--row-hover);}
+  .sb-group-header .ico{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+  .sb-group-header .txt{flex:1;}
+  .sb-group-header .chev{font-size:11px;color:var(--muted);transition:transform .15s ease;}
+  .sb-group.collapsed .sb-group-header .chev{transform:rotate(-90deg);}
+  .sb-group.collapsed .sb-group-items{display:none;}
+  .sb-group-items{display:flex;flex-direction:column;gap:2px;padding:2px 0 6px 0;}
+  .sb-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px 10px 30px;border-radius:8px;
+    cursor:pointer;color:var(--text);font-size:13.5px;border:1px solid transparent;user-select:none;
+  }
+  .sb-item:hover{background:var(--row-hover);}
+  .sb-item.active{background:var(--accent);color:#fff;font-weight:600;}
+  .sb-item .ico{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+  .sb-item .txt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sb-item .ext{
+    font-size:13px;opacity:.55;text-decoration:none;color:inherit;padding:2px 4px;border-radius:4px;
+    flex-shrink:0;
+  }
+  .sb-item .ext:hover{opacity:1;background:rgba(255,255,255,.12);}
+  .sb-footer{padding:12px 16px;font-size:10.5px;color:var(--muted);border-top:1px solid var(--border);}
+  #main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  #topbar{
+    display:flex;align-items:center;gap:12px;padding:10px 16px;
+    background:var(--head);border-bottom:1px solid var(--border);
+  }
+  #toggleBtn{
+    background:var(--input-bg);border:1px solid var(--border);color:var(--text);
+    border-radius:6px;padding:7px 10px;cursor:pointer;font-size:14px;line-height:1;
+  }
+  #toggleBtn:hover{border-color:var(--accent);}
+  #currentTitle{font-size:14px;font-weight:600;color:#fff;flex:1;}
+  #openNewTab{
+    background:var(--input-bg);border:1px solid var(--border);color:var(--text);
+    border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px;text-decoration:none;
+  }
+  #openNewTab:hover{border-color:var(--accent);}
+  #frameWrap{flex:1;position:relative;background:#fff;}
+  #frameWrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;}
+  #placeholder{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,.85);font-size:14px;background:var(--brand);
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="sb-header">
+    <div class="brand">Sistema Central de Reporting</div>
+    <div class="sub">Grup Fedefarma</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-group" data-group="ops">
+      <div class="sb-group-header">
+        <span class="ico">🏭</span><span class="txt">Portal Ops</span><span class="chev">▾</span>
+      </div>
+      <div class="sb-group-items">
+        <div class="sb-item" data-report="portalops-public" data-title="Portal d'Informes (Ops · Públic)" data-src="Portal_Informes.html">
+          <span class="ico">📄</span><span class="txt">Portal d'Informes (Ops · Públic)</span>
+          <a class="ext" href="Portal_Informes.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="portalops-web" data-title="Portal d'Informes Ops (Web)" data-src="https://fmiret.github.io/PortalInformesOps-Public/Portal_Informes.html">
+          <span class="ico">🌐</span><span class="txt">Portal d'Informes Ops (Web)</span>
+          <a class="ext" href="https://fmiret.github.io/PortalInformesOps-Public/Portal_Informes.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-group" data-group="projectes">
+      <div class="sb-group-header">
+        <span class="ico">🗂️</span><span class="txt">Portal Projectes</span><span class="chev">▾</span>
+      </div>
+      <div class="sb-group-items">
+        <div class="sb-item" data-report="prodop" data-title="Reparto de Horas PRODOP" data-src="CarlesValles/Dashboard_PRODOP.html">
+          <span class="ico">📊</span><span class="txt">Reparto de Horas PRODOP</span>
+          <a class="ext" href="CarlesValles/Dashboard_PRODOP.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="salidas-palau" data-title="Salidas de rutas e-commerce - Palau" data-src="Portal Acces Projectes/Salidas palau/salida_palau.html">
+          <span class="ico">🚚</span><span class="txt">Salidas de rutas e-commerce - Palau</span>
+          <a class="ext" href="Portal%20Acces%20Projectes/Salidas%20palau/salida_palau.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="noche-multizona" data-title="Informe noche multizona" data-src="Portal Acces Projectes/Informe noche multizona/informe_noche_multizona.html">
+          <span class="ico">🌙</span><span class="txt">Informe noche multizona</span>
+          <a class="ext" href="Portal%20Acces%20Projectes/Informe%20noche%20multizona/informe_noche_multizona.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="incidencias-palau" data-title="Incidencias - Almacén Palau (solo lectura)" data-src="Albert Lazaro - incidencias_palau_visor/incidencias_palau_visor.html">
+          <span class="ico">⚠️</span><span class="txt">Incidencias - Almacén Palau (solo lectura)</span>
+          <a class="ext" href="Albert%20Lazaro%20-%20incidencias_palau_visor/incidencias_palau_visor.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="ibd-schaefer" data-title="Seguimiento IBD - Schaefer (Palau)" data-src="Portal Acces Projectes/ibds/seguimiento_ibd_schaefer.html">
+          <span class="ico">📦</span><span class="txt">Seguimiento IBD - Schaefer (Palau)</span>
+          <a class="ext" href="Portal%20Acces%20Projectes/ibds/seguimiento_ibd_schaefer.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="lu-bajo-stock" data-title="LU con menos de 10 uds (AR/AS)" data-src="Portal Acces Projectes/lu_bajo_stock.html">
+          <span class="ico">📉</span><span class="txt">LU con menos de 10 uds (AR/AS)</span>
+          <a class="ext" href="Portal%20Acces%20Projectes/lu_bajo_stock.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="encajadora-cmc" data-title="Seguiment encaixadora CMC" data-src="Seguimiento_Encajadora_CMC.html">
+          <span class="ico">🤖</span><span class="txt">Seguiment encaixadora CMC</span>
+          <a class="ext" href="Seguimiento_Encajadora_CMC.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-group" data-group="resta">
+      <div class="sb-group-header">
+        <span class="ico">📚</span><span class="txt">Portal Resta Informes</span><span class="chev">▾</span>
+      </div>
+      <div class="sb-group-items">
+        <div class="sb-item" data-report="devolucions" data-title="Visor de parametrització de devolucions" data-src="Devolucions Ruben/Visor_Devoluciones.html">
+          <span class="ico">↩️</span><span class="txt">Visor de devolucions</span>
+          <a class="ext" href="Devolucions%20Ruben/Visor_Devoluciones.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+        <div class="sb-item" data-report="stock-magatzem" data-title="Stock per Magatzem/Laboratori/Compte" data-src="Stock_Magatzem_Laboratori_Compte.html">
+          <span class="ico">🗃️</span><span class="txt">Stock per Magatzem/Laboratori/Compte</span>
+          <a class="ext" href="Stock_Magatzem_Laboratori_Compte.html" target="_blank" title="Obrir en pestanya nova" onclick="event.stopPropagation()">↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-footer">Portal central d'accés als informes HTML — versió publicada. Alguns enllaços (Portal Projectes, Visor de devolucions) només funcionen des del PC de Francesc, on hi ha la resta de carpetes del repositori Dev.</div>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <button id="toggleBtn" title="Mostrar/amagar el menú (tecla [)">☰</button>
+    <div id="currentTitle">Selecciona un informe</div>
+    <a id="openNewTab" href="#" target="_blank">Obrir en pestanya nova ↗</a>
+  </div>
+  <div id="frameWrap">
+    <div id="placeholder">Selecciona un informe del menú per visualitzar-lo aquí.</div>
+  </div>
+</div>
+
+<script>
+const sidebar = document.getElementById('sidebar');
+const toggleBtn = document.getElementById('toggleBtn');
+const items = document.querySelectorAll('.sb-item');
+const placeholder = document.getElementById('placeholder');
+const currentTitle = document.getElementById('currentTitle');
+const frameWrap = document.getElementById('frameWrap');
+const openNewTab = document.getElementById('openNewTab');
+const frames = {};
+
+toggleBtn.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); });
+document.addEventListener('keydown', (e) => { if (e.key === '[') sidebar.classList.toggle('collapsed'); });
+
+function showReport(key, src, title) {
+  Object.values(frames).forEach(f => { f.style.display = 'none'; });
+  if (!frames[key]) {
+    const frame = document.createElement('iframe');
+    frame.src = src;
+    frameWrap.appendChild(frame);
+    frames[key] = frame;
+  }
+  frames[key].style.display = 'block';
+  placeholder.style.display = 'none';
+  currentTitle.textContent = title;
+  openNewTab.href = src;
+  items.forEach(i => i.classList.toggle('active', i.dataset.report === key));
+}
+
+items.forEach(item => {
+  item.addEventListener('click', () => showReport(item.dataset.report, item.dataset.src, item.dataset.title));
+});
+
+document.querySelectorAll('.sb-group-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.closest('.sb-group').classList.toggle('collapsed');
+  });
+});
+</script>
+
+</body>
+</html>
