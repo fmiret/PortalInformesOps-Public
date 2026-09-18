@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Documentació - Sistema Central de Reporting</title>
+<style>
+  :root{
+    --bg:#16171a; --card:#1e2023; --border:#33353a; --text:#e7e7e5;
+    --muted:#8b8d92; --accent:#B31E83; --head:#26282c;
+    --input-bg:#101113; --brand:#B31E83;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--brand); color:var(--text); margin:0; padding:32px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 4px 0;color:#fff;}
+  .sub{color:rgba(255,255,255,.85);font-size:13px;margin-bottom:24px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:22px;}
+  h2{font-size:19px;color:#fff;margin:0 0 4px 0;border-bottom:2px solid var(--accent);padding-bottom:10px;}
+  .h2-sub{font-size:12.5px;color:var(--muted);margin:6px 0 18px 0;}
+  h3{font-size:15px;color:var(--accent);margin:22px 0 6px 0;}
+  h3:first-of-type{margin-top:4px;}
+  p{font-size:13.5px;line-height:1.6;margin:0 0 10px 0;}
+  ol,ul{font-size:13.5px;line-height:1.6;margin:0 0 10px 0;padding-left:22px;}
+  li{margin-bottom:10px;}
+  strong{color:#fff;}
+  code{background:var(--input-bg);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:12px;}
+  .toc{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:24px;}
+  .toc div{font-weight:600;font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;letter-spacing:.03em;}
+  .toc a{color:var(--text);font-size:13px;text-decoration:none;display:block;padding:3px 0;}
+  .toc a:hover{color:var(--accent);}
+  .note{background:#3a2f12;border:1px solid #8a6d1f;color:#e8c468;border-radius:8px;padding:12px 16px;font-size:12.5px;margin-top:20px;}
+  .badge{display:inline-block;background:var(--accent);color:#fff;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle;}
+  .item-title{color:#fff;font-weight:600;}
+  .item-src{font-size:11.5px;color:var(--muted);margin:2px 0 4px 0;}
+  .cta{
+    display:inline-block;background:var(--accent);color:#fff;font-weight:600;text-decoration:none;
+    padding:9px 16px;border-radius:8px;font-size:13px;margin-top:6px;
+  }
+  .cta:hover{filter:brightness(1.08);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Documentació — Sistema Central de Reporting</h1>
+  <div class="sub">Portal de portals de Francesc: menú central d'accés a tots els informes HTML del repositori <code>Dev</code>. Aquesta pàgina explica què conté cada línia de cada grup del menú, d'on surten les dades (quan es coneix) i quina informació hi trobaràs — de manera que no calgui obrir cada informe per saber què és.</div>
+
+  <div class="card">
+    <a class="cta" href="https://fmiret.github.io/PortalInformesOps-Public/Sistema_Central_Reporting.html" target="_blank">↗ Obrir el Sistema Central de Reporting</a>
+    <p style="margin-top:14px;">Aquesta és la pàgina en viu del menú que es documenta aquí sota. Alguns dels seus enllaços (Portal Projectes, Visor de devolucions, Suport) només funcionen des del PC de Francesc, ja que apunten a carpetes privades del repositori local <code>Dev</code> — publicats igualment a GitHub Pages perquè la resta (Portal Ops i les Sortides) sí que hi són accessibles.</p>
+  </div>
+
+  <div class="toc">
+    <div>Contingut</div>
+    <a href="#scr-ops">🏭 Portal Ops</a>
+    <a href="#scr-projectes">🗂️ Portal Projectes</a>
+    <a href="#scr-resta">📚 Portal Resta Informes</a>
+    <a href="#scr-sortides">📤 Sortides Actibios/Nukleum/OL</a>
+    <a href="#scr-suport">🛠️ Suport</a>
+  </div>
+
+  <div class="card" id="scr-ops">
+    <h2>🏭 Portal Ops</h2>
+    <div class="h2-sub">2 línies que apunten al mateix Portal d'Informes de GIFF (Explotació d'Operacions), en 2 ubicacions diferents.</div>
+    <ul>
+      <li><span class="item-title">Portal d'Informes (Ops · Públic)</span><div class="item-src">còpia local dins <code>PortalInformesOps-Public/</code></div></li>
+      <li><span class="item-title">Portal d'Informes Ops (Web)</span><div class="item-src"><a href="https://fmiret.github.io/PortalInformesOps-Public/Portal_Informes.html" target="_blank" style="color:var(--accent);">https://fmiret.github.io/PortalInformesOps-Public/Portal_Informes.html</a></div></li>
+    </ul>
+    <p>Aquest portal empaqueta <strong>Informe Diari</strong> (vendes per almacén) i <strong>Dossier Mensual</strong> (Producció, Productivitat, Qualitat, Pèrdua Coneguda, REVI, Transport, Stock). Té la seva pròpia documentació completa, molt més detallada que aquest resum, integrada com a línia <strong>"📖 Documentació"</strong> al peu de la seva pròpia barra lateral — obre el portal i fes-hi clic per veure fonts de dades, camps, criteris de negoci i totes les trampes conegudes de cada bloc.</p>
+    <div class="note">⚠️ Aquesta variant pública NO porta embeguts <strong>Stock per Magatzem/Laboratori/Compte</strong> ni <strong>Seguiment Encaixadora CMC</strong> — es documenten i s'enllacen des d'aquí mateix, a "Portal Projectes" i "Portal Resta Informes" (veure més avall).</div>
+  </div>
+
+  <div class="card" id="scr-projectes">
+    <h2>🗂️ Portal Projectes</h2>
+    <div class="h2-sub">Informes operatius d'almacén i projectes puntuals, cadascun un fitxer HTML independent.</div>
+
+    <h3>📊 Reparto de Horas PRODOP</h3>
+    <p>Dashboard que desglossa el <strong>cost i les hores de mà d'obra</strong> de l'almacén 2000 per tasca (entrades, preparació, reposicions, reubicacions, devolucions, packing), per empresa, per zona d'almacén i per família de producte. El cost surt de comptabilitat (subcomptes 6298.xx i projectes de pooling), creuat amb les hores fitxades i amb fitxers de tipus d'ubicació i devolucions. Dona el repartiment econòmic i temporal del treball al magatzem.</p>
+
+    <h3>🚚 Salidas de rutas e-commerce - Palau</h3>
+    <p>Visor en temps real de l'estat de sortida de les rutes de repartiment e-commerce del magatzem de Palau (franges R1 a R4): nombre de comandes, comandes amb/sense sortida, % de sortida, hora prevista, i detall d'albarans/expedicions/cubetes/ubicacions pendents. Inclou també contactes d'agències de transport i preguntes freqüents del procés operatiu.</p>
+
+    <h3>🌙 Informe noche multizona</h3>
+    <p>Resum nocturn (auto-refresc cada 2 minuts) de les sortides multizona des de Palau: línies d'albarà, cubetes, cubetes amb RFID, embossats, pickings de nevera/silo-etis i hora de fi de picking, per almacén de destinació. Font: albarans de venda (AV) amb origen Palau i ruta multizona, creuats amb WAMAS (l'"hora de fi de picking" es calcula quan WAMAS finalitza el picking de cada cubeta).</p>
+
+    <h3>⚠️ Incidencias - Almacén Palau (solo lectura)</h3>
+    <p>Tauler tipus kanban (Nou / En curs / Revisió / Finalitzat) amb les incidències de l'almacén de Palau: àrea (p. ex. Sistemes/Wamas), criticitat, departament responsable, descripció, causa arrel i historial. Origen: importació de l'històric d'incidències en Excel de Palau, complementat amb entrades manuals posteriors. Versió de només lectura.</p>
+
+    <h3>📦 Seguimiento IBD - Schaefer (Palau)</h3>
+    <p>Llistat de seguiment dels IBD (moviments d'entrada) processats pel sistema automatitzat Schaefer a Palau: data, tipus, unitats i línies segons <strong>GIFF</strong> vs. segons <strong>WAMAS</strong>, estat i indicador "Pimsga", amb detall article a article. Permet detectar descoincidències entre allò registrat a GIFF i allò rebut al WMS per a cada entrada gestionada per Schaefer.</p>
+
+    <h3>📉 LU con menos de 10 uds (AR/AS)</h3>
+    <p>Llistat d'unitats de càrrega (LU) a les ubicacions dels passadissos AR*/AS* amb menys de 10 unitats d'un mateix article i lot, amb una columna de "destí suggerit" (una altra ubicació amb ≥10 unitats del mateix article/lot). Eina operativa per identificar oportunitats de compactació d'estoc. Font de dades no confirmada explícitament al fitxer, però per l'estructura sembla provenir del sistema de gestió d'almacén (WAMAS).</p>
+
+    <h3>🤖 Seguiment encaixadora CMC</h3>
+    <p>Panell d'anàlisi del log del robot encaixador CMC CartonWrap (magatzem 2000): l'usuari hi arrossega manualment l'Excel <code>ff_robot_log</code> exportat des d'Axional/jrep, i tota l'anàlisi (KPIs, gràfics) es calcula al navegador — no depèn de cap CSV del Portal. Documentació completa dins la pròpia pàgina "Documentació" del Portal d'Informes intern.</p>
+  </div>
+
+  <div class="card" id="scr-resta">
+    <h2>📚 Portal Resta Informes</h2>
+
+    <h3>↩️ Visor de devolucions</h3>
+    <p>Dashboard analític sobre la parametrització de devolucions de caducats: per a cada article, si accepta o rebutja devolució des de farmàcia (<code>devpro</code>) i des d'almacén (<code>devalm</code>), i si aquest valor respon a una política declarada pel laboratori o és simplement el valor per defecte. Pestanyes de "Foto de cobertura", "A quién reclamar" (per KAM), "Laboratorios", "Parámetro a revisar" i "Colas de acción", creuat amb vendes dels últims 12 mesos i estoc disponible per identificar risc.</p>
+    <p><strong>Font de dades (indicada al propi peu del document):</strong> Informix, base <code>pdbreal</code> via DSN <code>RMIRROR</code> (taules <code>ff_artfede</code>, <code>gvenmovh</code>/<code>l</code>, <code>galmstkg</code>, <code>gproveed</code>, <code>garticul</code>), regenerat amb un script R (<code>actualizar_todo.R</code>).</p>
+
+    <h3>🗃️ Stock per Magatzem/Laboratori/Compte</h3>
+    <p>Foto actual d'estoc per magatzem+compte+article (Informix, DSN <code>ol_rssreal</code>). Ja no va embegut al Portal públic des del 15/09/2026 — es publica com a fitxer standalone. Documentació completa (fonts, camps, filtres) dins la pàgina "Documentació" del Portal d'Informes intern.</p>
+  </div>
+
+  <div class="card" id="scr-sortides">
+    <h2>📤 Sortides Actibios/Nukleum/OL</h2>
+    <div class="h2-sub">5 fitxers de sortides allotjats directament a SharePoint (fora d'aquest repositori i del pipeline de GIFF).</div>
+    <ul>
+      <li><span class="item-title">Actibios</span></li>
+      <li><span class="item-title">Bitio</span></li>
+      <li><span class="item-title">M&amp;D Pharmacy</span></li>
+      <li><span class="item-title">Vadefarma (Madrid GDP/Unnefar)</span></li>
+      <li><span class="item-title">Vanguard/Nukleum</span></li>
+    </ul>
+    <p>Són enllaços directes a documents de SharePoint gestionats fora del repositori <code>Dev</code> i fora del pipeline d'Informix/GIFF — no hi ha manera d'inspeccionar-ne el contingut, format o freqüència d'actualització des d'aquí: cal obrir cada enllaç directament per veure-hi el detall. Pel seu nom, semblen fitxers de sortides/lliuraments per a cada operador logístic o client (Actibios, Nukleum, Operador Logístic), però aquesta pàgina no pot confirmar-ne el contingut exacte sense obrir-los.</p>
+  </div>
+
+  <div class="card" id="scr-suport">
+    <h2>🛠️ Suport</h2>
+    <ul>
+      <li><span class="item-title">Documentació del projecte</span><div class="item-src">enllaça al <code>README.md</code> del repositori privat <code>PortalInformesOps</code> — el punt d'entrada a tota la documentació tècnica (arquitectura, instal·lació, scripts i SQL, diccionari de dades GIFF).</div></li>
+      <li><span class="item-title">Sharepoint</span><div class="item-src"><a href="https://fedefarma1-my.sharepoint.com/places" target="_blank" style="color:var(--accent);">fedefarma1-my.sharepoint.com/places</a></div></li>
+      <li><span class="item-title">Accés a Github Projecte</span><div class="item-src"><a href="https://github.com/fmiret/PortalInformesOps" target="_blank" style="color:var(--accent);">github.com/fmiret/PortalInformesOps</a></div></li>
+      <li><span class="item-title">Accés a carpeta local projecte</span><div class="item-src">obre la carpeta <code>Dev</code> al PC de Francesc.</div></li>
+    </ul>
+    <div class="note">
+      <strong>⚠️ "Accés a carpeta local projecte" des de la versió publicada (GitHub Pages):</strong> un enllaç <code>file://</code> no es pot obrir mai des d'una pàgina servida per <code>https://</code> — és un bloqueig de seguretat del propi navegador, no un error d'aquest portal. Per això, quan es clica des de la web pública, en comptes d'intentar-ho i fallar en silenci, el Sistema Central de Reporting <strong>copia la ruta al porta-retalls</strong> (<code>navigator.clipboard.writeText</code>) i mostra un avís perquè l'usuari l'enganxi a mà a l'Explorador de Windows (Win+E) o a la barra d'adreces. Detecció via <code>location.protocol</code>: si la pàgina s'obre com a <code>file://</code> (al PC de Francesc), l'enllaç funciona amb normalitat; si s'obre com a <code>https://</code>, s'activa el mode de còpia. Només té sentit per a Francesc, ja que és l'únic amb accés a aquella carpeta.
+    </div>
+  </div>
+</div>
+</body>
+</html>
