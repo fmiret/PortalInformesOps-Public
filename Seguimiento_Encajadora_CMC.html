@@ -4410,6 +4410,10 @@ window.toggleTheme = function() {
 (function(){
   const b = document.getElementById('themeToggle');
   if (b) b.addEventListener('click', window.toggleTheme);
+  // Tema fosc per defecte: es dispara el mateix toggle un cop carregat tot.
+  window.addEventListener('load', function(){
+    if (!document.body.classList.contains('dark')) window.toggleTheme();
+  });
 })();
 Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.font.size = 11;
